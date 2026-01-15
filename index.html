@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BAW Cesium Viewer mit JSON Kommentarfunktion</title>
+  
+  <!-- Performance Optimizations -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://api.cesium.com" crossorigin>
+  <link rel="dns-prefetch" href="https://assets.cesium.com">
+  
+  <!-- Preload critical resources -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/npm/cesium@1.132/Build/Cesium/Cesium.js" as="script">
+  <link rel="preload" href="https://cdn.jsdelivr.net/npm/cesium@1.132/Build/Cesium/Widgets/widgets.css" as="style">
+  
+  <!-- Load Cesium -->
+  <script src="https://cdn.jsdelivr.net/npm/cesium@1.132/Build/Cesium/Cesium.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/cesium@1.132/Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  
+  <!-- Load custom styles -->
+  <link rel="stylesheet" href="baw.css">
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner"></div>
+    <div id="loadingText">Cesium wird initialisiert...</div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Comment Mode Indicator -->
+  <div id="commentModeIndicator" class="comment-mode-indicator">
+    💬 Klicken Sie auf die Karte, um einen Kommentar hinzuzufügen
+  </div>
+
+  <!-- Main UI Panel -->
+  <div id="mainUI" class="main-ui">
+    <div class="ui-header">
+      <span>🏗 CESIUM | BAW Viewer</span>
+    </div>
+    <div class="ui-content">
+      <!-- Data Management -->
+      <div class="data-management">
+        <h4>📂 Kommentar-Daten</h4>
+        <div class="form-group">
+          <label class="form-label" for="userName">Ihr Name</label>
+          <input type="text" id="userName" class="form-input" placeholder="Max Mustermann">
+        </div>
+        <div class="data-actions">
+          <button id="exportJSON" class="btn btn-success btn-small">📄 JSON Export</button>
+          <button id="exportCSV" class="btn btn-success btn-small">📊 CSV Export</button>
+          <button id="importData" class="btn btn-primary btn-small">📥 Import</button>
+          <button id="clearData" class="btn btn-danger btn-small">🗑️ Löschen</button>
+        </div>
+        <input type="file" id="fileInput" class="hidden-file-input" accept=".json,.csv">
+        <div id="dataStatus" class="data-status">Bereit für Kommentare</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="sceneSelect">Modell auswählen</label>
+        <select id="sceneSelect" class="form-select">
+          <option value="">– Bitte auswählen –</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="imagerySelect">Kartenhintergrund</label>
+        <select id="imagerySelect" class="form-select">
+          <option value="ortho">Lokales Orthophoto (hochauflösend)</option>
+          <option value="bing" selected>Bing Aerial (global)</option>
+          <option value="osm">OpenStreetMap (global)</option>
+        </select>
+      </div>
+
+      <!-- Render Quality Control -->
+      <div class="form-group">
+        <label class="form-label" for="renderQualitySelect">🎮 Render-Qualität</label>
+        <select id="renderQualitySelect" class="form-select">
+          <option value="performance">⚡ Performance (schwache PCs)</option>
+          <option value="balanced" selected>⚖️ Ausgeglichen (empfohlen)</option>
+          <option value="quality">💎 Qualität (starke PCs)</option>
+        </select>
+        <div class="render-quality-info">
+          <small id="renderQualityDescription" style="color: #666; font-size: 12px; margin-top: 4px; display: block;">
+            Optimiert für gute Balance zwischen Qualität und Performance
+          </small>
+        </div>
+      </div>
+
+      <div id="panelToggles" class="checkbox-group" style="display: none;">
+        <div class="form-label">Panels</div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="toggleCommentsPanel">
+          <label for="toggleCommentsPanel">💬 Kommentare</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="toggleMeasurePanel">
+          <label for="toggleMeasurePanel">📏 Messen</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="toggleHiddenFeaturesPanel">
+          <label for="toggleHiddenFeaturesPanel">👁️ Elemente ausblenden</label>
+        </div>
+      </div>
+
+      <!-- CityGML Toggle (nur für Lauffen) -->
+      <div id="citygmlToggleContainer" class="checkbox-group" style="display: none;">
+        <div class="form-label">3D Gebäude</div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="citygmlToggle">
+          <label for="citygmlToggle">🏢 CityGML einblenden</label>
+        </div>
+      </div>
+
+      <!-- Lauffen Teilmodelle (nur für Lauffen) -->
+      <div id="lauffenModelToggles" class="checkbox-group" style="display: none;">
+        <div class="form-label">Teilmodelle</div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="model3256557" data-asset-id="3256557">
+          <label for="model3256557">🚧 Wehranlage</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="model3256547" data-asset-id="3256547">
+          <label for="model3256547">🐟 Fischleiter</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="model3256555" data-asset-id="3256555">
+          <label for="model3256555">⚙️ Aufschüttung</label>
+        </div>
+        <div style="margin-top: 8px;">
+          <button id="testLauffenModels" class="btn btn-ghost btn-small">🔧 Test Toggle</button>
+          <button id="showAllLauffen" class="btn btn-success btn-small">👁️ Alle zeigen</button>
+          <button id="hideAllLauffen" class="btn btn-danger btn-small">🙈 Alle verstecken</button>
+        </div>
+      </div>
+
+      <!-- Zeltingen Teilmodelle (nur für Zeltingen) -->
+      <div id="zeltingenModelToggles" class="checkbox-group" style="display: none;">
+        <div class="form-label">Teilmodelle</div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="model3251780" data-asset-id="3251780">
+          <label for="model3251780">🏗️ BIM Modell</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="model3341583" data-asset-id="3341583">
+          <label for="model3341583">☁️ Punktwolke</label>
+        </div>
+        <div style="margin-top: 8px;">
+          <button id="testZeltingenModels" class="btn btn-ghost btn-small">🔧 Test Toggle</button>
+          <button id="showAllZeltingen" class="btn btn-success btn-small">👁️ Alle zeigen</button>
+          <button id="hideAllZeltingen" class="btn btn-danger btn-small">🙈 Alle verstecken</button>
+        </div>
+      </div>
+
+      <!-- Punktwolken-Kontrolle (nur für Zeltingen) -->
+      <div id="pointCloudControls" class="checkbox-group" style="display: none;">
+        <div class="form-label">☁️ Punktwolken-Einstellungen</div>
+        
+        <!-- Point Size Control -->
+        <div style="margin-bottom: 12px;">
+          <label for="pointSizeControl" style="display: block; font-size: 12px; color: #333; margin-bottom: 4px;">🔸 Punktgröße: <span id="pointSizeValue">Normal</span></label>
+          <input type="range" id="pointSizeControl" min="0.1" max="2.0" step="0.1" value="0.5" style="width: 100%;">
+          <div style="display: flex; justify-content: space-between; font-size: 10px; color: #999; margin-top: 2px;">
+            <span>Sehr klein</span>
+            <span>Sehr groß</span>
+          </div>
+        </div>
+        
+        <!-- Distance Attenuation Control -->
+        <div class="checkbox-item" style="margin-bottom: 12px;">
+          <input type="checkbox" id="toggleAttenuation" checked>
+          <label for="toggleAttenuation" style="font-size: 14px; color: #333;">📏 Distance Attenuation</label>
+        </div>
+        
+        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e0e0e0;">
+          <button id="debugPointCloud" class="btn btn-ghost btn-small">🔧 Debug Info</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Box -->
+  <div id="infoBox" class="info-box">
+    <div class="info-header">
+      <div class="info-title">Objekt Information</div>
+      <button id="closeInfoBtn" class="close-btn">×</button>
+    </div>
+    <div id="infoContent"></div>
+    <div class="info-actions" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #444;">
+      <button id="hideFeatureBtn" class="btn btn-warning btn-small">👁️‍🗨️ Elemente ausblenden</button>
+    </div>
+  </div>
+
+  <!-- Hidden Features Panel -->
+  <div id="hiddenFeaturesPanel" class="hidden-features-panel">
+    <div class="comments-header">
+      <div class="comments-title">👁️ Versteckte Features</div>
+      <div>
+        <button id="toggleHideMode" class="btn btn-primary btn-small">🎯 Hide-Modus</button>
+        <button id="showAllHidden" class="btn btn-success btn-small">👁️ Alle zeigen</button>
+        <button id="closeHiddenFeaturesBtn" class="btn btn-ghost btn-small">×</button>
+      </div>
+    </div>
+    <div class="comments-content">
+      <div style="padding: 16px 20px;">
+        <div id="hideModeIndicator" class="hide-mode-indicator" style="display: none;">
+          <span style="color: #FF9800;">🎯 Hide-Modus aktiv - Klicke auf Element!</span>
+        </div>
+        <div id="hiddenFeaturesList" style="margin-top: 12px;">
+          <div class="no-hidden-features">
+            Keine versteckten Features.<br>
+            <small>Nutzen Sie den Hide-Modus oder verstecken Sie Elemente über die Info-Box.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Measurement Panel -->
+  <div id="measurePanel" class="measure-panel">
+    <div class="comments-header">
+      <div class="comments-title">📏 Mess-Werkzeuge</div>
+      <div>
+        <button id="clearMeasurements" class="btn btn-ghost btn-small" style="color: white; border-color: rgba(255,255,255,0.3);">🗑️</button>
+        <button id="closeMeasureBtn" class="btn btn-ghost btn-small" style="color: white; border-color: rgba(255,255,255,0.3);">×</button>
+      </div>
+    </div>
+    <div class="comments-content">
+      <div style="padding: 16px 20px;">
+        <!-- Measurement Mode Selection -->
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label class="form-label">Mess-Modus auswählen</label>
+          <select id="measureModeSelect" class="form-select">
+            <option value="">– Inaktiv –</option>
+            <option value="height">📏 Höhe über Terrain</option>
+            <option value="distance">📐 Punkt-zu-Punkt Abstand</option>
+            <option value="polyline">📏 Polygon-Länge</option>
+            <option value="area">📊 Polygon-Fläche</option>
+          </select>
+        </div>
+
+        <!-- Instructions -->
+        <div id="measureInstructions" style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 13px; color: #666; display: none;">
+          <div id="instructionText"></div>
+        </div>
+
+        <!-- Current Measurement Display -->
+        <div id="currentMeasurement" style="background: #e8f5e8; border: 2px solid #4CAF50; padding: 12px; border-radius: 8px; margin-bottom: 16px; display: none;">
+          <div style="font-weight: 600; color: #2e7d32; margin-bottom: 4px;">Aktueller Messwert:</div>
+          <div id="measurementValue" style="font-size: 18px; font-weight: bold; color: #1b5e20;"></div>
+          <div id="measurementDetails" style="font-size: 12px; color: #388e3c; margin-top: 4px;"></div>
+        </div>
+
+        <!-- Measurement History -->
+        <div id="measurementHistory" style="max-height: 200px; overflow-y: auto;">
+          <div style="font-weight: 600; color: #333; margin-bottom: 8px; display: none;" id="historyTitle">Letzte Messungen:</div>
+          <div id="historyList"></div>
+        </div>
+
+        <!-- Control Buttons -->
+        <div style="display: flex; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid #e0e0e0;">
+          <button id="finishMeasurement" class="btn btn-primary btn-small" style="display: none;">✔ Beenden</button>
+          <button id="cancelMeasurement" class="btn btn-ghost btn-small" style="display: none;">✗ Abbrechen</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comments Panel -->
+  <div id="commentsPanel" class="comments-panel">
+    <div class="comments-header">
+      <div class="comments-title">💬 Kommentare</div>
+      <div>
+        <button id="refreshComments" class="btn btn-ghost btn-small">🔄</button>
+        <button id="toggleCommentMode" class="btn btn-primary btn-small">✏️ Hinzufügen</button>
+        <button id="closeCommentsBtn" class="btn btn-ghost btn-small">×</button>
+      </div>
+    </div>
+    <div class="comments-content">
+      <div class="comments-list" id="commentsList">
+        <div class="no-comments" id="noComments">
+          Noch keine Kommentare vorhanden.<br>
+          <small>Aktivieren Sie den Hinzufügen-Modus und klicken Sie auf die Karte.</small>
+        </div>
+      </div>
+      <div class="add-comment-section">
+        <div class="comment-mode" id="commentModeStatus">
+          <span class="comment-mode-icon">💬</span>
+          <span id="commentModeText">Kommentar-Modus: Inaktiv</span>
+        </div>
+        <textarea id="commentInput" class="comment-input" placeholder="Neuen Kommentar eingeben..." disabled></textarea>
+        <div class="comment-submit-section">
+          <button id="addCommentBtn" class="btn btn-primary" disabled>💬 Kommentar hinzufügen</button>
+          <button id="cancelCommentBtn" class="btn btn-ghost" disabled>Abbrechen</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comment Edit Overlay -->
+  <div id="commentEditOverlay" class="comment-edit-overlay">
+    <div class="comment-edit-dialog">
+      <div class="comment-edit-title">Kommentar bearbeiten</div>
+      <textarea id="commentEditInput" class="comment-edit-input" placeholder="Kommentar bearbeiten..."></textarea>
+      <div class="comment-edit-actions">
+        <button id="saveCommentBtn" class="btn btn-primary">💾 Speichern</button>
+        <button id="cancelEditBtn" class="btn btn-ghost">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CSV Export Dialog -->
+  <div id="csvExportOverlay" class="csv-export-overlay">
+    <div class="csv-export-dialog">
+      <div class="csv-export-title">📊 CSV Export - Vorschau</div>
+      <div id="csvPreview" class="csv-preview"></div>
+      <div class="csv-actions">
+        <button id="downloadCSV" class="btn btn-success">💾 CSV herunterladen</button>
+        <button id="copyCSV" class="btn btn-primary">📋 In Zwischenablage</button>
+        <button id="cancelCSV" class="btn btn-ghost">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load custom JavaScript -->
+  <script src="baw-utils.js"></script>
+  <script src="baw-comments.js"></script>
+  <script src="baw-core.js"></script>
+</body>
+</html>
