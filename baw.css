@@ -1,8 +1,9 @@
 /* =============================================================================
-   BAW Cesium Viewer - Optimized CSS (v2.1)
+   BAW Cesium Viewer - Optimized CSS (v2.2 - FIXED)
    - Performance: Critical CSS, GPU acceleration, reduced motion
    - UX: Improved mobile layout, accessibility, dark mode
    - Maintainability: Consistent variables, BEM-like structure
+   - FIX: Added missing classes, consistent is-hidden usage
 ============================================================================= */
 
 /* ===========================
@@ -104,6 +105,13 @@ body,
 }
 
 /* ===========================
+   Utility Classes (FIXED)
+   =========================== */
+.is-hidden {
+  display: none !important;
+}
+
+/* ===========================
    Loading & Overlays (Critical CSS)
    =========================== */
 .loading-overlay {
@@ -120,7 +128,7 @@ body,
 }
 
 .loading-overlay.is-hidden {
-  display: none;
+  display: none !important;
 }
 
 .spinner {
@@ -209,6 +217,15 @@ body,
   margin-bottom: var(--spacing-md);
   font-weight: 600;
   color: var(--color-text-primary);
+}
+
+/* ===========================
+   UI Content (ADDED - was missing)
+   =========================== */
+.ui-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
 }
 
 /* ===========================
@@ -315,6 +332,70 @@ body,
 }
 
 /* ===========================
+   Render Quality Info (ADDED - was inline)
+   =========================== */
+.render-quality-info {
+  margin-top: var(--spacing-xs);
+}
+
+.render-quality-description {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  display: block;
+}
+
+/* ===========================
+   Model Toggle Buttons (ADDED - was inline)
+   =========================== */
+.model-toggle-buttons {
+  margin-top: var(--spacing-sm);
+  display: flex;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+}
+
+/* ===========================
+   Point Cloud Controls (ADDED - was inline)
+   =========================== */
+.point-cloud-slider-container {
+  margin-bottom: var(--spacing-md);
+}
+
+.point-cloud-slider-label {
+  display: block;
+  font-size: 12px;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.point-cloud-slider {
+  width: 100%;
+}
+
+.point-cloud-slider-range {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.point-cloud-checkbox {
+  margin-bottom: var(--spacing-md);
+}
+
+.point-cloud-checkbox label {
+  font-size: 14px;
+  color: var(--color-text-primary);
+}
+
+.point-cloud-debug {
+  margin-top: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--color-border);
+}
+
+/* ===========================
    Comments Panel (Optimized Animations)
    =========================== */
 .comments-panel {
@@ -347,11 +428,6 @@ body,
   animation:
     slideIn var(--transition-slow) forwards,
     fadeIn var(--transition-slow) forwards;
-}
-
-@keyframes slideIn {
-  from { transform: translateY(-50%) translateX(100%); }
-  to { transform: translateY(-50%) translateX(0); }
 }
 
 @keyframes fadeIn {
@@ -467,6 +543,12 @@ body,
   margin-bottom: var(--spacing-md);
   font-size: 14px;
   color: var(--color-text-secondary);
+}
+
+/* Comment Mode Icon (ADDED - was missing) */
+.comment-mode-icon {
+  font-size: 16px;
+  line-height: 1;
 }
 
 .comment-submit-section {
@@ -594,6 +676,10 @@ body,
   will-change: transform;
 }
 
+.comment-mode-indicator:not(.is-hidden) {
+  display: block;
+}
+
 /* ===========================
    Edit & Export Dialogs (Accessible)
    =========================== */
@@ -606,6 +692,11 @@ body,
   display: none;
   justify-content: center;
   align-items: center;
+}
+
+.comment-edit-overlay:not(.is-hidden),
+.csv-export-overlay:not(.is-hidden) {
+  display: flex;
 }
 
 .comment-edit-dialog,
@@ -701,6 +792,10 @@ body,
   will-change: transform;
 }
 
+.info-box:not(.is-hidden) {
+  display: block;
+}
+
 .info-header {
   display: flex;
   justify-content: space-between;
@@ -719,6 +814,9 @@ body,
   display: flex;
   gap: var(--spacing-sm);
   flex-wrap: wrap;
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid #444;
 }
 
 .close-btn {
@@ -764,6 +862,10 @@ body,
   will-change: transform;
 }
 
+.hidden-features-panel:not(.is-hidden) {
+  display: block;
+}
+
 @supports not (backdrop-filter: blur(12px)) {
   .hidden-features-panel {
     background: rgba(255, 255, 255, 0.95);
@@ -787,6 +889,14 @@ body,
   padding: 10px;
   font-size: 13px;
   text-align: center;
+}
+
+.hide-mode-indicator.is-hidden {
+  display: none !important;
+}
+
+.hide-mode-indicator-text {
+  color: var(--color-warning);
 }
 
 .hidden-feature-item {
@@ -850,6 +960,10 @@ body,
   will-change: transform;
 }
 
+.measure-panel:not(.is-hidden) {
+  display: block;
+}
+
 @supports not (backdrop-filter: blur(12px)) {
   .measure-panel {
     background: rgba(255, 255, 255, 0.95);
@@ -865,6 +979,78 @@ body,
   padding: 0;
   max-height: 400px;
   overflow-y: auto;
+}
+
+/* Measurement specific styles (ADDED - was inline) */
+.measure-instructions {
+  background: var(--color-light-bg);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-lg);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.measure-current {
+  background: #e8f5e8;
+  border: 2px solid var(--color-success);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-lg);
+}
+
+.measure-current-title {
+  font-weight: 600;
+  color: #2e7d32;
+  margin-bottom: var(--spacing-xs);
+}
+
+.measure-current-value {
+  font-size: 18px;
+  font-weight: bold;
+  color: #1b5e20;
+}
+
+.measure-current-details {
+  font-size: 12px;
+  color: #388e3c;
+  margin-top: var(--spacing-xs);
+}
+
+.measure-history {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.measure-history-title {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.measure-history-item {
+  background: var(--color-light-bg);
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  margin-bottom: var(--spacing-xs);
+  font-size: 12px;
+}
+
+.measure-history-item-type {
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.measure-history-item-time {
+  color: var(--color-text-secondary);
+}
+
+.measure-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--color-border);
 }
 
 /* ===========================

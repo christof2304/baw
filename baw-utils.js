@@ -1,6 +1,6 @@
 /**
  * BAW Cesium Viewer - Utilities and Configuration
- * Version: 2.0.0
+ * Version: 2.0.1 - FIXED (is-hidden consistency)
  * Cesium Version: 1.132
  */
 
@@ -232,19 +232,19 @@ const Utils = {
 // UI Helper Functions
 // ===========================
 const UIHelpers = {
-  // Show loading overlay
+  // Show loading overlay - FIXED: use is-hidden instead of hidden
   showLoading(text = "Lädt...") {
     const loadingText = Utils.getElement("loadingText");
     if (loadingText) loadingText.textContent = text;
     
     const overlay = Utils.getElement("loadingOverlay");
-    if (overlay) overlay.classList.remove("hidden");
+    if (overlay) overlay.classList.remove("is-hidden");
   },
 
-  // Hide loading overlay
+  // Hide loading overlay - FIXED: use is-hidden instead of hidden
   hideLoading() {
     const overlay = Utils.getElement("loadingOverlay");
-    if (overlay) overlay.classList.add("hidden");
+    if (overlay) overlay.classList.add("is-hidden");
   },
 
   // Show toast notification
@@ -291,11 +291,16 @@ const UIHelpers = {
     if (element) element.innerHTML = html;
   },
   
-  // Toggle element visibility
+  // Toggle element visibility - FIXED: use is-hidden class consistently
   toggleVisibility(elementId, show) {
     const element = Utils.getElement(elementId);
     if (element) {
-      element.style.display = show ? 'block' : 'none';
+      if (show) {
+        element.classList.remove("is-hidden");
+        element.style.display = '';  // Let CSS handle the display
+      } else {
+        element.classList.add("is-hidden");
+      }
     }
   },
   
@@ -344,8 +349,9 @@ class MeasurementSystem {
     const cancelBtn = Utils.getElement('cancelMeasurement');
     
     if (mode) {
-      if (instructions) instructions.style.display = 'block';
-      if (cancelBtn) cancelBtn.style.display = 'inline-flex';
+      // FIXED: use is-hidden class
+      if (instructions) instructions.classList.remove('is-hidden');
+      if (cancelBtn) cancelBtn.classList.remove('is-hidden');
       
       const instructionTexts = {
         'height': 'Klicken Sie auf einen Punkt, um die Höhe über dem Terrain zu messen.',
@@ -355,13 +361,21 @@ class MeasurementSystem {
       };
       
       if (instructionText) instructionText.textContent = instructionTexts[mode] || '';
-      if (finishBtn) finishBtn.style.display = (mode === 'polyline' || mode === 'area') ? 'inline-flex' : 'none';
+      // FIXED: use is-hidden class
+      if (finishBtn) {
+        if (mode === 'polyline' || mode === 'area') {
+          finishBtn.classList.remove('is-hidden');
+        } else {
+          finishBtn.classList.add('is-hidden');
+        }
+      }
       
       UIHelpers.showToast(`Mess-Modus aktiviert: ${this.getModeDisplayName(mode)}`, 'info', 3000);
     } else {
-      if (instructions) instructions.style.display = 'none';
-      if (finishBtn) finishBtn.style.display = 'none';
-      if (cancelBtn) cancelBtn.style.display = 'none';
+      // FIXED: use is-hidden class
+      if (instructions) instructions.classList.add('is-hidden');
+      if (finishBtn) finishBtn.classList.add('is-hidden');
+      if (cancelBtn) cancelBtn.classList.add('is-hidden');
     }
     
     this.updateDisplay();
@@ -716,20 +730,22 @@ class MeasurementSystem {
     const historyList = Utils.getElement('historyList');
     
     if (this.measurementHistory.length > 0) {
-      if (historyTitle) historyTitle.style.display = 'block';
+      // FIXED: use is-hidden class
+      if (historyTitle) historyTitle.classList.remove('is-hidden');
       
       if (historyList) {
         const html = this.measurementHistory.map(item => `
-          <div style="background: #f8f9fa; padding: 8px; border-radius: 4px; margin-bottom: 4px; font-size: 12px;">
-            <div style="font-weight: 500; color: #333;">${item.type}: ${item.value}</div>
-            <div style="color: #666;">${item.timestamp}</div>
+          <div class="measure-history-item">
+            <div class="measure-history-item-type">${item.type}: ${item.value}</div>
+            <div class="measure-history-item-time">${item.timestamp}</div>
           </div>
         `).join('');
         
         historyList.innerHTML = html;
       }
     } else {
-      if (historyTitle) historyTitle.style.display = 'none';
+      // FIXED: use is-hidden class
+      if (historyTitle) historyTitle.classList.add('is-hidden');
       if (historyList) historyList.innerHTML = '';
     }
   }
@@ -831,6 +847,7 @@ class HiddenFeaturesSystem {
         btn.textContent = "🛑 Stoppen";
         btn.className = "btn btn-danger btn-small";
       }
+      // FIXED: use is-hidden class
       UIHelpers.toggleVisibility("hideModeIndicator", true);
       if (cesiumContainer) cesiumContainer.classList.add("hide-mode");
       
@@ -840,6 +857,7 @@ class HiddenFeaturesSystem {
         btn.textContent = "🎯 Hide-Modus";
         btn.className = "btn btn-primary btn-small";
       }
+      // FIXED: use is-hidden class
       UIHelpers.toggleVisibility("hideModeIndicator", false);
       if (cesiumContainer) cesiumContainer.classList.remove("hide-mode");
       
@@ -881,7 +899,8 @@ class HiddenFeaturesSystem {
     this.updateDisplay();
     
     const panel = Utils.getElement("hiddenFeaturesPanel");
-    if (panel && panel.style.display === "none") {
+    // FIXED: check is-hidden class
+    if (panel && panel.classList.contains("is-hidden")) {
       UIHelpers.toggleVisibility("hiddenFeaturesPanel", true);
     }
 

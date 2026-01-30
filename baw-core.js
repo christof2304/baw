@@ -708,6 +708,8 @@ class CesiumApp {
     const panel = BAWUtils.utils.getElement(`${type}Panel`);
     if (!panel) return;
     
+    // FIXED: use is-hidden class consistently
+    panel.classList.remove("is-hidden");
     panel.style.display = "block";
     
     // Use setTimeout for animation instead of RAF to avoid context issues
@@ -754,6 +756,8 @@ class CesiumApp {
     }
     
     setTimeout(() => {
+      // FIXED: use is-hidden class consistently
+      panel.classList.add("is-hidden");
       panel.style.display = "none";
       this.checkPanelCollisions();
     }, 300);
@@ -800,10 +804,11 @@ class CesiumApp {
       info: BAWUtils.utils.getElement("infoBox")
     };
     
+    // FIXED: check is-hidden class instead of style.display
     const visibility = {
-      comments: panels.comments?.style.display !== "none",
-      measure: panels.measure?.style.display !== "none",
-      info: panels.info?.style.display !== "none"
+      comments: panels.comments && !panels.comments.classList.contains("is-hidden"),
+      measure: panels.measure && !panels.measure.classList.contains("is-hidden"),
+      info: panels.info && !panels.info.classList.contains("is-hidden")
     };
     
     if (window.innerWidth <= 768) {
@@ -843,9 +848,10 @@ class CesiumApp {
   manageOpenPanels() {
     if (window.innerWidth > 480) return;
     
+    // FIXED: check is-hidden class instead of style.display
     const openPanels = ["comments", "measure"].filter(type => {
       const panel = BAWUtils.utils.getElement(`${type}Panel`);
-      return panel && panel.style.display !== "none";
+      return panel && !panel.classList.contains("is-hidden");
     });
     
     if (openPanels.length > 1) {
