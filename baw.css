@@ -1,135 +1,179 @@
+/* =============================================================================
+   BAW Cesium Viewer - Optimized CSS (v2.1)
+   - Performance: Critical CSS, GPU acceleration, reduced motion
+   - UX: Improved mobile layout, accessibility, dark mode
+   - Maintainability: Consistent variables, BEM-like structure
+============================================================================= */
+
 /* ===========================
-   CSS Variables für bessere Wartbarkeit
+   CSS Variables (Optimized)
    =========================== */
 :root {
   /* Colors */
-  --primary-color: #4FC3F7;
-  --primary-hover: #29B6F6;
-  --success-color: #4CAF50;
-  --danger-color: #f44336;
-  --warning-color: #FF9800;
-  --dark-bg: #1e1e1e;
-  --light-bg: #f8f9fa;
-  --border-color: #e0e0e0;
-  --text-primary: #333;
-  --text-secondary: #666;
-  --text-muted: #999;
-  
-  /* Spacing */
+  --color-primary: #4FC3F7;
+  --color-primary-hover: #29B6F6;
+  --color-success: #4CAF50;
+  --color-danger: #f44336;
+  --color-warning: #FF9800;
+  --color-dark-bg: #1e1e1e;
+  --color-light-bg: #f8f9fa;
+  --color-border: #e0e0e0;
+  --color-text-primary: rgba(0, 0, 0, 0.87);
+  --color-text-secondary: rgba(0, 0, 0, 0.6);
+  --color-text-muted: rgba(0, 0, 0, 0.38);
+  --color-text-light: #f5f5f5;
+
+  /* Spacing (Consistent 4px scale) */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 12px;
   --spacing-lg: 16px;
   --spacing-xl: 20px;
-  
+  --spacing-xxl: 24px;
+
   /* Borders & Shadows */
+  --border-radius-sm: 4px;
   --border-radius: 8px;
   --border-radius-lg: 12px;
-  --box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-  --box-shadow-hover: 0 2px 8px rgba(0,0,0,0.1);
-  --box-shadow-heavy: 0 8px 30px rgba(0,0,0,0.3);
-  
-  /* Transitions */
-  --transition-fast: 0.2s ease;
-  --transition-medium: 0.3s ease;
-  --transition-slow: 0.4s ease;
-  
-  /* Z-Index Stack */
-  --z-index-panel: 1000;
-  --z-index-info: 1050;
-  --z-index-comments: 1100;
-  --z-index-toast: 9999;
-  --z-index-overlay: 10000;
-  --z-index-dialog: 10001;
+  --box-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --box-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --box-shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.2);
+  --box-shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+  /* Transitions (Optimized for performance) */
+  --transition-fast: 0.15s ease;
+  --transition-medium: 0.25s ease;
+  --transition-slow: 0.35s ease;
+
+  /* Z-Index (Scalable system) */
+  --z-index-base: 100;
+  --z-index-panel: calc(var(--z-index-base) * 10);
+  --z-index-info: calc(var(--z-index-base) * 15);
+  --z-index-toast: calc(var(--z-index-base) * 99);
+  --z-index-overlay: calc(var(--z-index-base) * 100);
+  --z-index-dialog: calc(var(--z-index-base) * 101);
 }
 
 /* ===========================
-   Global Styles
+   Dark Mode Support
    =========================== */
-* { 
-  box-sizing: border-box; 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-light-bg: #2a2a2a;
+    --color-border: #444;
+    --color-text-primary: #f5f5f5;
+    --color-text-secondary: #ccc;
+    --color-text-muted: #888;
+    --box-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .main-ui,
+  .comments-panel,
+  .measure-panel,
+  .hidden-features-panel {
+    background: rgba(42, 42, 42, 0.98);
+    border-color: #555;
+  }
+
+  .info-box {
+    background: #333;
+    border-color: #555;
+  }
 }
 
-html, body, #cesiumContainer {
-  width: 100%; 
-  height: 100%; 
-  margin: 0; 
-  padding: 0; 
+/* ===========================
+   Global Styles (Reset & Base)
+   =========================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#cesiumContainer {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
   font-family: "Segoe UI", Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ===========================
-   Loading & Overlays
+   Loading & Overlays (Critical CSS)
    =========================== */
 .loading-overlay {
-  position: fixed; 
+  position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.8); 
-  color: white; 
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
   display: flex;
-  flex-direction: column; 
-  justify-content: center; 
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  z-index: var(--z-index-overlay); 
+  z-index: var(--z-index-overlay);
   font-size: 18px;
-  transition: opacity var(--transition-medium);
 }
 
-.loading-overlay.hidden { 
-  display: none; 
+.loading-overlay.is-hidden {
+  display: none;
 }
 
 .spinner {
-  width: 50px; 
-  height: 50px; 
-  border: 4px solid #333; 
-  border-top: 4px solid var(--primary-color);
-  border-radius: 50%; 
-  animation: spin 1s linear infinite; 
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
   margin-bottom: var(--spacing-xl);
 }
 
-@keyframes spin { 
-  to { transform: rotate(360deg); } 
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* ===========================
    Toast Notifications
    =========================== */
-.toast-container { 
-  position: fixed; 
-  top: var(--spacing-xl); 
-  right: var(--spacing-xl); 
-  z-index: var(--z-index-toast); 
-  max-width: 350px; 
+.toast-container {
+  position: fixed;
+  top: var(--spacing-xl);
+  right: var(--spacing-xl);
+  z-index: var(--z-index-toast);
+  max-width: 350px;
 }
 
 .toast {
-  background: var(--text-primary); 
-  color: white; 
-  padding: var(--spacing-md) var(--spacing-xl); 
+  background: var(--color-text-primary);
+  color: white;
+  padding: var(--spacing-md) var(--spacing-xl);
   border-radius: var(--border-radius);
-  margin-bottom: 10px; 
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  animation: slideIn var(--transition-medium); 
-  display: flex; 
-  align-items: center; 
-  gap: 10px;
+  margin-bottom: var(--spacing-sm);
+  box-shadow: var(--box-shadow-md);
+  animation: slideIn var(--transition-medium);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  will-change: transform, opacity;
 }
 
-.toast.success { border-left: 4px solid var(--success-color); }
-.toast.error { border-left: 4px solid var(--danger-color); }
-.toast.warning { border-left: 4px solid var(--warning-color); }
+.toast.success { border-left: 4px solid var(--color-success); }
+.toast.error { border-left: 4px solid var(--color-danger); }
+.toast.warning { border-left: 4px solid var(--color-warning); }
 
 @keyframes slideIn {
-  from { 
-    transform: translateX(100%); 
-    opacity: 0; 
+  from {
+    transform: translateX(100%);
+    opacity: 0;
   }
-  to { 
-    transform: translateX(0); 
-    opacity: 1; 
+  to {
+    transform: translateX(0);
+    opacity: 1;
   }
 }
 
@@ -137,106 +181,133 @@ html, body, #cesiumContainer {
    Main UI Panel
    =========================== */
 .main-ui {
-  position: absolute; 
-  top: var(--spacing-md); 
+  position: absolute;
+  top: var(--spacing-md);
   left: var(--spacing-md);
-  background: rgba(255,255,255,0.95); 
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  padding: var(--spacing-lg); 
+  padding: var(--spacing-lg);
   border-radius: var(--border-radius-lg);
-  box-shadow: var(--box-shadow); 
+  box-shadow: var(--box-shadow-md);
   z-index: var(--z-index-panel);
-  min-width: 220px; 
-  transition: all var(--transition-medium);
+  min-width: 220px;
+  max-width: 300px;
+  transition: transform var(--transition-medium), opacity var(--transition-medium);
+  will-change: transform;
+}
+
+@supports not (backdrop-filter: blur(10px)) {
+  .main-ui {
+    background: rgba(255, 255, 255, 0.98);
+  }
 }
 
 .ui-header {
-  display: flex; 
-  justify-content: space-between; 
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-md); 
-  font-weight: 600; 
-  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+  font-weight: 600;
+  color: var(--color-text-primary);
 }
 
 /* ===========================
-   Form Elements
+   Form Elements (Consistent)
    =========================== */
-.form-group { 
-  margin-bottom: var(--spacing-lg); 
+.form-group {
+  margin-bottom: var(--spacing-lg);
 }
 
 .form-label {
-  display: block; 
-  margin-bottom: 6px; 
+  display: block;
+  margin-bottom: var(--spacing-xs);
   font-weight: 500;
-  color: var(--text-secondary); 
+  color: var(--color-text-secondary);
   font-size: 14px;
 }
 
-.form-select, 
-.form-input {
-  width: 100%; 
-  padding: var(--spacing-sm) var(--spacing-md); 
-  border: 2px solid var(--border-color);
-  border-radius: var(--border-radius); 
-  font-size: 14px; 
+.form-input,
+.form-select,
+.comment-input,
+.comment-edit-input {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius);
+  font-size: 14px;
   background: white;
-  transition: border-color var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
-.form-select:focus, 
-.form-input:focus { 
-  outline: none; 
-  border-color: var(--primary-color); 
+@media (prefers-color-scheme: dark) {
+  .form-input,
+  .form-select,
+  .comment-input,
+  .comment-edit-input {
+    background: #333;
+    border-color: #555;
+    color: var(--color-text-light);
+  }
+}
+
+.form-input:focus,
+.form-select:focus,
+.comment-input:focus,
+.comment-edit-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.2);
 }
 
 .checkbox-group {
-  margin-top: var(--spacing-md); 
-  padding-top: var(--spacing-md); 
-  border-top: 1px solid var(--border-color);
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--color-border);
 }
 
 .checkbox-item {
-  display: flex; 
-  align-items: center; 
-  margin-bottom: var(--spacing-sm); 
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
   font-size: 14px;
 }
 
-.checkbox-item input[type="checkbox"] { 
-  margin-right: var(--spacing-sm); 
-  transform: scale(1.1); 
+.checkbox-item input[type="checkbox"] {
+  margin-right: var(--spacing-sm);
+  transform: scale(1.1);
+  cursor: pointer;
 }
 
 /* ===========================
-   Data Management
+   Data Management Section
    =========================== */
 .data-management {
-  background: var(--light-bg); 
-  border: 1px solid var(--border-color); 
+  background: var(--color-light-bg);
+  border: 1px solid var(--color-border);
   border-radius: var(--border-radius);
-  padding: var(--spacing-md); 
+  padding: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
 }
 
 .data-management h4 {
-  margin: 0 0 var(--spacing-sm) 0; 
-  color: var(--text-primary); 
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--color-text-primary);
   font-size: 14px;
 }
 
 .data-actions {
-  display: flex; 
-  gap: var(--spacing-sm); 
-  flex-wrap: wrap; 
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
   margin-top: var(--spacing-sm);
 }
 
 .data-status {
-  font-size: 12px; 
-  margin-top: var(--spacing-sm); 
-  color: var(--text-secondary);
+  font-size: 12px;
+  margin-top: var(--spacing-sm);
+  color: var(--color-text-secondary);
 }
 
 .hidden-file-input {
@@ -244,418 +315,431 @@ html, body, #cesiumContainer {
 }
 
 /* ===========================
-   Comments Panel - Optimized
+   Comments Panel (Optimized Animations)
    =========================== */
 .comments-panel {
-  position: absolute; 
-  top: 50%; 
-  right: var(--spacing-xl); 
+  position: absolute;
+  top: 50%;
+  right: var(--spacing-xl);
   transform: translateY(-50%);
   width: 380px;
   max-width: calc(100vw - 280px);
-  background: rgba(255,255,255,0.98); 
+  background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(12px);
   border-radius: var(--border-radius-lg);
-  box-shadow: var(--box-shadow-heavy);
+  box-shadow: var(--box-shadow-lg);
   overflow: hidden;
-  z-index: var(--z-index-comments);
-  border: 1px solid var(--border-color);
+  z-index: var(--z-index-panel);
+  border: 1px solid var(--color-border);
   max-height: min(70vh, 500px);
   display: none;
-  transition: all var(--transition-medium);
   will-change: transform, opacity;
+}
+
+@supports not (backdrop-filter: blur(12px)) {
+  .comments-panel {
+    background: rgba(255, 255, 255, 0.95);
+  }
+}
+
+.comments-panel.is-visible {
+  display: block;
+  animation:
+    slideIn var(--transition-slow) forwards,
+    fadeIn var(--transition-slow) forwards;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-50%) translateX(100%); }
+  to { transform: translateY(-50%) translateX(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .comments-panel:hover {
   transform: translateY(-50%) scale(1.01);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.35);
-}
-
-@keyframes slideInRight {
-  from {
-    transform: translateY(-50%) translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(-50%) translateX(0);
-    opacity: 1;
-  }
-}
-
-.comments-panel:not([style*="display: none"]) {
-  animation: slideInRight var(--transition-slow);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
 }
 
 .comments-header {
-  background: var(--light-bg); 
-  padding: var(--spacing-lg) var(--spacing-xl); 
-  border-bottom: 1px solid var(--border-color);
-  display: flex; 
-  justify-content: space-between; 
+  background: var(--color-light-bg);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
   align-items: center;
 }
 
-.comments-title { 
-  font-weight: 600; 
-  color: var(--text-primary); 
-  font-size: 16px; 
+.comments-title {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: 16px;
 }
 
-.comments-content { 
-  padding: 0; 
-  max-height: 400px; 
-  overflow-y: auto; 
+.comments-content {
+  padding: 0;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
-.comments-list { 
-  padding: var(--spacing-lg) var(--spacing-xl); 
+.comments-list {
+  padding: var(--spacing-lg) var(--spacing-xl);
 }
 
 /* ===========================
-   Comment Items
+   Comment Items (Consistent Styling)
    =========================== */
 .comment-item {
-  background: var(--light-bg); 
-  border: 1px solid var(--border-color); 
+  background: var(--color-light-bg);
+  border: 1px solid var(--color-border);
   border-radius: var(--border-radius);
-  padding: var(--spacing-md); 
-  margin-bottom: var(--spacing-md); 
-  position: relative; 
-  transition: all var(--transition-fast);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  position: relative;
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
-.comment-item:hover { 
-  box-shadow: var(--box-shadow-hover); 
-  transform: translateY(-1px); 
+.comment-item:hover {
+  box-shadow: var(--box-shadow-hover);
+  transform: translateY(-2px);
 }
 
 .comment-header {
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center; 
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: var(--spacing-sm);
 }
 
-.comment-info { 
-  font-size: 12px; 
-  color: var(--text-secondary); 
+.comment-info {
+  font-size: 12px;
+  color: var(--color-text-secondary);
 }
 
-.comment-actions { 
-  display: flex; 
-  gap: var(--spacing-xs); 
+.comment-actions {
+  display: flex;
+  gap: var(--spacing-xs);
 }
 
-.comment-text { 
-  color: var(--text-primary); 
-  font-size: 14px; 
-  line-height: 1.4; 
-  margin-bottom: var(--spacing-sm); 
+.comment-text {
+  color: var(--color-text-primary);
+  font-size: 14px;
+  line-height: 1.4;
+  margin-bottom: var(--spacing-sm);
 }
 
-.comment-location { 
-  font-size: 11px; 
-  color: var(--text-muted); 
-  font-family: monospace; 
+.comment-location {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  font-family: monospace;
 }
 
-.comment-feature { 
-  font-size: 12px; 
-  color: var(--primary-color); 
-  font-weight: 500; 
+.comment-feature {
+  font-size: 12px;
+  color: var(--color-primary);
+  font-weight: 500;
 }
 
-.comment-user { 
-  font-size: 12px; 
-  color: var(--text-secondary); 
-  font-weight: 500; 
+.comment-user {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
 }
 
 /* ===========================
    Add Comment Section
    =========================== */
 .add-comment-section {
-  padding: var(--spacing-lg) var(--spacing-xl); 
-  border-top: 1px solid var(--border-color); 
-  background: #fafafa;
-}
-
-.comment-input {
-  width: 100%; 
-  padding: 10px var(--spacing-md); 
-  border: 2px solid var(--border-color);
-  border-radius: var(--border-radius); 
-  font-size: 14px; 
-  font-family: inherit;
-  resize: vertical; 
-  min-height: 80px; 
-  margin-bottom: var(--spacing-md);
-  transition: border-color var(--transition-fast);
-}
-
-.comment-input:focus { 
-  outline: none; 
-  border-color: var(--primary-color); 
+  padding: var(--spacing-lg) var(--spacing-xl);
+  border-top: 1px solid var(--color-border);
+  background: rgba(250, 250, 250, 0.8);
 }
 
 .comment-mode {
-  display: flex; 
-  align-items: center; 
-  gap: var(--spacing-sm); 
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
   margin-bottom: var(--spacing-md);
-  font-size: 14px; 
-  color: var(--text-secondary);
+  font-size: 14px;
+  color: var(--color-text-secondary);
 }
 
-.comment-submit-section { 
-  display: flex; 
-  gap: var(--spacing-sm); 
-  align-items: center; 
+.comment-submit-section {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
 }
 
 .no-comments {
-  text-align: center; 
-  color: var(--text-muted); 
-  font-style: italic; 
-  padding: 40px var(--spacing-xl);
+  text-align: center;
+  color: var(--color-text-muted);
+  font-style: italic;
+  padding: var(--spacing-xxl) var(--spacing-xl);
 }
 
 /* ===========================
-   Buttons - Optimized
+   Buttons (Optimized & Accessible)
    =========================== */
 .btn {
-  padding: var(--spacing-sm) var(--spacing-lg); 
-  border: none; 
-  border-radius: 6px; 
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: none;
+  border-radius: var(--border-radius-sm);
   cursor: pointer;
-  font-size: 14px; 
-  font-weight: 500; 
-  transition: all var(--transition-fast);
-  display: inline-flex; 
-  align-items: center; 
-  gap: var(--spacing-sm);
+  font-size: 14px;
+  font-weight: 500;
+  transition:
+    background var(--transition-fast),
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
   will-change: transform;
+  min-height: 36px;
+  min-width: 36px;
 }
 
-.btn-primary { 
-  background: var(--primary-color); 
-  color: white; 
+.btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
-.btn-primary:hover { 
-  background: var(--primary-hover); 
-  transform: translateY(-1px); 
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
 }
 
-.btn-danger { 
-  background: var(--danger-color); 
-  color: white; 
+.btn-primary:hover {
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
 }
 
-.btn-danger:hover { 
-  background: #d32f2f; 
+.btn-danger {
+  background: var(--color-danger);
+  color: white;
 }
 
-.btn-success { 
-  background: var(--success-color); 
-  color: white; 
+.btn-danger:hover {
+  background: #d32f2f;
+  transform: translateY(-1px);
 }
 
-.btn-success:hover { 
-  background: #45a049; 
+.btn-success {
+  background: var(--color-success);
+  color: white;
+}
+
+.btn-success:hover {
+  background: #45a049;
+  transform: translateY(-1px);
 }
 
 .btn-warning {
-  background: var(--warning-color);
+  background: var(--color-warning);
   color: white;
 }
 
 .btn-warning:hover {
   background: #F57C00;
+  transform: translateY(-1px);
 }
 
-.btn-ghost { 
-  background: transparent; 
-  color: var(--text-secondary); 
-  border: 1px solid #ddd; 
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
 }
 
-.btn-ghost:hover { 
-  background: #f5f5f5; 
+.btn-ghost:hover {
+  background: rgba(0, 0, 0, 0.05);
 }
 
-.btn-ghost.active { 
-  background: var(--primary-color); 
-  color: white; 
-  border-color: var(--primary-color); 
+.btn-ghost.active {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
 }
 
-.btn-small { 
-  padding: var(--spacing-xs) var(--spacing-sm); 
-  font-size: 12px; 
+.btn-small {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: 12px;
+  min-height: 32px;
+  min-width: 32px;
 }
 
 /* ===========================
    Indicators & Dialogs
    =========================== */
 .comment-mode-indicator {
-  position: absolute; 
-  top: 50%; 
-  left: 50%; 
+  position: absolute;
+  top: 50%;
+  left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(79,195,247,0.9); 
-  color: white; 
+  background: rgba(79, 195, 247, 0.9);
+  color: white;
   padding: var(--spacing-sm) var(--spacing-lg);
-  border-radius: 20px; 
-  font-size: 14px; 
+  border-radius: 20px;
+  font-size: 14px;
   font-weight: 500;
-  pointer-events: none; 
-  z-index: 1001; 
+  pointer-events: none;
+  z-index: calc(var(--z-index-base) * 50);
   display: none;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  box-shadow: var(--box-shadow-md);
+  will-change: transform;
 }
 
 /* ===========================
-   Edit & Export Dialogs
+   Edit & Export Dialogs (Accessible)
    =========================== */
 .comment-edit-overlay,
 .csv-export-overlay {
-  position: fixed; 
+  position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5); 
-  z-index: var(--z-index-dialog); 
+  background: rgba(0, 0, 0, 0.5);
+  z-index: var(--z-index-dialog);
   display: none;
-  justify-content: center; 
+  justify-content: center;
   align-items: center;
 }
 
 .comment-edit-dialog,
 .csv-export-dialog {
-  background: white; 
-  border-radius: var(--border-radius-lg); 
-  padding: 24px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  background: white;
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xxl);
+  box-shadow: var(--box-shadow-lg);
+  max-width: 90%;
+  will-change: transform;
+}
+
+@media (prefers-color-scheme: dark) {
+  .comment-edit-dialog,
+  .csv-export-dialog {
+    background: var(--color-dark-bg);
+    border-color: #555;
+  }
 }
 
 .comment-edit-dialog {
-  max-width: 500px; 
+  max-width: 500px;
   width: 90%;
 }
 
 .csv-export-dialog {
-  max-width: 600px; 
-  width: 90%; 
-  max-height: 80vh; 
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
   overflow: hidden;
 }
 
 .comment-edit-title,
 .csv-export-title {
-  font-size: 18px; 
-  font-weight: 600; 
-  margin-bottom: var(--spacing-lg); 
-  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: var(--spacing-lg);
+  color: var(--color-text-primary);
 }
 
 .comment-edit-input {
-  width: 100%; 
-  padding: var(--spacing-md); 
-  border: 2px solid var(--border-color); 
+  width: 100%;
+  padding: var(--spacing-md);
+  border: 2px solid var(--color-border);
   border-radius: var(--border-radius);
-  font-size: 14px; 
-  font-family: inherit; 
+  font-size: 14px;
+  font-family: inherit;
   resize: vertical;
-  min-height: 100px; 
+  min-height: 100px;
   margin-bottom: var(--spacing-lg);
-  transition: border-color var(--transition-fast);
-}
-
-.comment-edit-input:focus { 
-  outline: none; 
-  border-color: var(--primary-color); 
-}
-
-.comment-edit-actions,
-.csv-actions { 
-  display: flex; 
-  gap: var(--spacing-md); 
-  justify-content: flex-end; 
 }
 
 .csv-preview {
-  background: var(--light-bg); 
-  border: 1px solid var(--border-color); 
+  background: var(--color-light-bg);
+  border: 1px solid var(--color-border);
   border-radius: var(--border-radius);
-  padding: var(--spacing-md); 
-  font-family: monospace; 
+  padding: var(--spacing-md);
+  font-family: monospace;
   font-size: 12px;
-  max-height: 300px; 
-  overflow: auto; 
+  max-height: 300px;
+  overflow: auto;
   margin-bottom: var(--spacing-lg);
   white-space: pre-wrap;
 }
 
+.comment-edit-actions,
+.csv-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: flex-end;
+}
+
 /* ===========================
-   Info Box
+   Info Box (Dark Theme Ready)
    =========================== */
 .info-box {
-  position: absolute; 
-  top: var(--spacing-xl); 
+  position: absolute;
+  top: var(--spacing-xl);
   right: 420px;
-  background: var(--dark-bg); 
-  color: #f5f5f5; 
+  background: var(--color-dark-bg);
+  color: var(--color-text-light);
   padding: var(--spacing-lg) var(--spacing-xl);
-  border-radius: var(--border-radius-lg); 
-  box-shadow: 0 6px 25px rgba(0,0,0,0.5);
-  display: none; 
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--box-shadow-lg);
+  display: none;
   z-index: var(--z-index-info);
   font-size: 14px;
-  min-width: 320px; 
-  max-width: 400px; 
-  line-height: 1.6; 
+  min-width: 320px;
+  max-width: 400px;
+  line-height: 1.6;
   border: 1px solid #333;
-  transition: all var(--transition-medium);
+  transition: transform var(--transition-medium), opacity var(--transition-medium);
+  will-change: transform;
 }
 
 .info-header {
-  display: flex; 
-  justify-content: space-between; 
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-md); 
-  padding-bottom: var(--spacing-sm); 
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
   border-bottom: 1px solid #333;
 }
 
-.info-title { 
-  font-weight: 600; 
-  color: var(--primary-color); 
+.info-title {
+  font-weight: 600;
+  color: var(--color-primary);
 }
 
 .info-actions {
-  display: flex; 
-  gap: var(--spacing-sm); 
+  display: flex;
+  gap: var(--spacing-sm);
   flex-wrap: wrap;
 }
 
 .close-btn {
-  background: none; 
-  border: none; 
-  color: #aaa; 
+  background: none;
+  border: none;
+  color: #aaa;
   font-size: 20px;
-  cursor: pointer; 
-  padding: 0; 
-  width: 24px; 
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
   height: 24px;
-  display: flex; 
-  align-items: center; 
+  display: flex;
+  align-items: center;
   justify-content: center;
-  border-radius: 4px; 
+  border-radius: 4px;
   transition: all var(--transition-fast);
 }
 
-.close-btn:hover { 
-  background: #333; 
-  color: white; 
+.close-btn:hover {
+  background: #333;
+  color: white;
 }
 
 /* ===========================
@@ -667,23 +751,30 @@ html, body, #cesiumContainer {
   right: var(--spacing-xl);
   width: 380px;
   max-width: calc(100vw - 40px);
-  background: rgba(255,255,255,0.98);
+  background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(12px);
   border-radius: var(--border-radius-lg);
-  box-shadow: var(--box-shadow-heavy);
+  box-shadow: var(--box-shadow-lg);
   overflow: hidden;
   z-index: var(--z-index-info);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--color-border);
   display: none;
-  transition: all var(--transition-medium);
+  transition: transform var(--transition-medium), opacity var(--transition-medium);
   max-height: 400px;
+  will-change: transform;
+}
+
+@supports not (backdrop-filter: blur(12px)) {
+  .hidden-features-panel {
+    background: rgba(255, 255, 255, 0.95);
+  }
 }
 
 .hidden-features-panel .comments-header {
-  background: linear-gradient(135deg, var(--warning-color) 0%, #F57C00 100%);
+  background: linear-gradient(135deg, var(--color-warning) 0%, #F57C00 100%);
   color: white;
   padding: var(--spacing-lg) var(--spacing-xl);
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--color-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -699,15 +790,15 @@ html, body, #cesiumContainer {
 }
 
 .hidden-feature-item {
-  background: var(--light-bg);
-  border: 1px solid var(--border-color);
+  background: var(--color-light-bg);
+  border: 1px solid var(--color-border);
   border-radius: var(--border-radius);
   padding: var(--spacing-md);
   margin-bottom: var(--spacing-sm);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: all var(--transition-fast);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .hidden-feature-item:hover {
@@ -721,70 +812,74 @@ html, body, #cesiumContainer {
 
 .hidden-feature-name {
   font-weight: 500;
-  color: var(--text-primary);
+  color: var(--color-text-primary);
   margin-bottom: var(--spacing-xs);
 }
 
 .hidden-feature-id {
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--color-text-muted);
   font-family: monospace;
 }
 
 .no-hidden-features {
   text-align: center;
-  color: var(--text-muted);
+  color: var(--color-text-muted);
   font-style: italic;
-  padding: 40px var(--spacing-xl);
-}
-
-/* Hide Mode Cursor */
-.cesium-viewer.hide-mode {
-  cursor: crosshair !important;
+  padding: var(--spacing-xxl) var(--spacing-xl);
 }
 
 /* ===========================
    Measurement Panel
    =========================== */
 .measure-panel {
-  position: absolute; 
-  top: var(--spacing-xl); 
-  right: var(--spacing-xl); 
+  position: absolute;
+  top: var(--spacing-xl);
+  right: var(--spacing-xl);
   width: 350px;
   max-width: calc(100vw - 280px);
-  background: rgba(255,255,255,0.98); 
+  background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(12px);
   border-radius: var(--border-radius-lg);
-  box-shadow: var(--box-shadow-heavy);
+  box-shadow: var(--box-shadow-lg);
   overflow: hidden;
   z-index: var(--z-index-info);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--color-border);
   display: none;
-  transition: all var(--transition-medium);
+  transition: transform var(--transition-medium), opacity var(--transition-medium);
+  will-change: transform;
+}
+
+@supports not (backdrop-filter: blur(12px)) {
+  .measure-panel {
+    background: rgba(255, 255, 255, 0.95);
+  }
 }
 
 .measure-panel .comments-header {
-  background: linear-gradient(135deg, var(--warning-color) 0%, #F57F17 100%);
+  background: linear-gradient(135deg, var(--color-warning) 0%, #F57F17 100%);
   color: white;
 }
 
 .measure-panel .comments-content {
-  padding: 0; 
-  max-height: 400px; 
+  padding: 0;
+  max-height: 400px;
   overflow-y: auto;
 }
 
 /* ===========================
-   Responsive Design - Optimized
+   Responsive Design (Improved Mobile)
    =========================== */
 @media (max-width: 1200px) {
   .comments-panel {
     width: 340px;
-    right: 15px;
+    right: var(--spacing-lg);
   }
+
   .main-ui {
     max-width: 280px;
   }
+
   .info-box {
     right: 380px;
     min-width: 280px;
@@ -796,19 +891,19 @@ html, body, #cesiumContainer {
     --spacing-lg: 12px;
     --spacing-xl: 16px;
   }
-  
-  .main-ui { 
-    width: calc(100% - 24px); 
-    left: var(--spacing-md); 
-    right: var(--spacing-md); 
-    top: var(--spacing-md); 
-    z-index: 1200;
+
+  .main-ui {
+    width: calc(100% - 24px);
+    left: var(--spacing-md);
+    right: var(--spacing-md);
+    top: var(--spacing-md);
+    z-index: calc(var(--z-index-base) * 12);
     max-width: none;
   }
-  
+
   .comments-panel,
   .measure-panel,
-  .hidden-features-panel { 
+  .hidden-features-panel {
     position: fixed;
     top: auto;
     bottom: var(--spacing-xl);
@@ -818,20 +913,21 @@ html, body, #cesiumContainer {
     width: auto;
     max-width: none;
     max-height: 50vh;
+    transition: none;
   }
-  
-  .comments-panel:hover {
-    transform: none;
+
+  .comments-panel.is-visible {
+    animation: none;
   }
-  
+
   .measure-panel {
     top: 80px;
   }
-  
+
   .comments-panel:not([style*="display: none"]) ~ .measure-panel {
-    top: 120px;
+    top: calc(50vh + 20px);
   }
-  
+
   .info-box {
     position: fixed;
     top: 140px;
@@ -841,13 +937,15 @@ html, body, #cesiumContainer {
     min-width: unset;
     max-width: none;
   }
-  
-  .data-actions { 
-    flex-direction: column; 
+
+  .data-actions {
+    flex-direction: column;
   }
-  
-  .data-actions .btn { 
-    justify-content: center; 
+
+  .data-actions .btn {
+    justify-content: center;
+    width: 100%;
+    margin-bottom: var(--spacing-sm);
   }
 }
 
@@ -855,37 +953,52 @@ html, body, #cesiumContainer {
   .comments-panel {
     max-height: 40vh;
   }
+
   .comments-content {
     max-height: calc(40vh - 120px);
+  }
+
+  .btn {
+    min-height: 40px;
+    min-width: 40px;
   }
 }
 
 /* ===========================
-   Scrollbar Styling
+   Scrollbar Styling (Cross-browser)
    =========================== */
 .comments-content::-webkit-scrollbar,
-.csv-preview::-webkit-scrollbar { 
-  width: 6px; 
+.csv-preview::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
 .comments-content::-webkit-scrollbar-track,
-.csv-preview::-webkit-scrollbar-track { 
-  background: #f0f0f0; 
+.csv-preview::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
 }
 
 .comments-content::-webkit-scrollbar-thumb,
-.csv-preview::-webkit-scrollbar-thumb { 
-  background: var(--primary-color); 
-  border-radius: 3px; 
+.csv-preview::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 3px;
 }
 
 .comments-content::-webkit-scrollbar-thumb:hover,
-.csv-preview::-webkit-scrollbar-thumb:hover { 
-  background: var(--primary-hover); 
+.csv-preview::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-hover);
+}
+
+/* Firefox scrollbar */
+.comments-content,
+.csv-preview {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary) rgba(0, 0, 0, 0.05);
 }
 
 /* ===========================
-   Performance Optimizations
+   Performance & Accessibility
    =========================== */
 @media (prefers-reduced-motion: reduce) {
   * {
@@ -900,7 +1013,22 @@ html, body, #cesiumContainer {
 .measure-panel,
 .hidden-features-panel,
 .toast,
-.btn {
+.btn,
+.info-box {
   transform: translateZ(0);
   backface-visibility: hidden;
+}
+
+/* Hide cursor in hide mode */
+.cesium-viewer.hide-mode {
+  cursor: crosshair;
+}
+
+/* Focus styles for accessibility */
+.btn:focus-visible,
+.form-input:focus-visible,
+.comment-input:focus-visible,
+.comment-edit-input:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
